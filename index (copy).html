@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title class="text-blue-500">MotoresBot 🤖🛩️ </title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+        }
+        #question {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056B3;
+        }
+    </style>
+</head>
+<body>
+    <h1>MotoresBot 🤖🛩️</h1>
+    <div id="question"></div>
+    <div id="answer" style="display: none;"></div>
+    <button id="showAnswerBtn" onclick="showAnswer()"> Mostrar respuesta 🧐 </button>
+    <button id="prevBtn" onclick="prevQuestion()">Anterior ⬅️ </button>
+    <button id="nextBtn" onclick="nextQuestion()"> Siguiente ➡️ </button>
+    <br>
+    <input type="radio" id="sequential" name="order" value="sequential" checked>
+    <label for="sequential">Por orden</label> 
+    <input type="radio" id="random" name="order" value="random">
+    <label for="random">Random</label>
+
+    <script>
+        // Replace this with your own CSV data
+        const csvData = `EXAMPLE1, EXAMPLE2`;
+
+        const questions = csvData.split('\n').map(line => {
+            const [question, answer] = line.split(',');
+            return { question, answer };
+        });
+
+        let currentIndex = -1;
+        let prevIndex = -1;
+
+        function showQuestion(index) {
+            const questionElement = document.getElementById('question');
+            const answerElement = document.getElementById('answer');
+            questionElement.textContent = questions[index].question;
+            answerElement.textContent = questions[index].answer;
+            answerElement.style.display = 'none';
+        }
+
+        function showAnswer() {
+            const answerElement = document.getElementById('answer');
+            answerElement.style.display = 'block';
+        }
+
+        function prevQuestion() {
+            prevIndex = currentIndex;
+            currentIndex = (currentIndex - 1 + questions.length) % questions.length;
+            showQuestion(currentIndex);
+        }
+
+        function nextQuestion() {
+            prevIndex = currentIndex;
+            const sequential = document.getElementById('sequential').checked;
+            if (sequential) {
+                currentIndex = (currentIndex + 1) % questions.length;
+            } else {
+                currentIndex = Math.floor(Math.random() * questions.length);
+            }
+            showQuestion(currentIndex);
+        }
+
+        // Show the first question
+        nextQuestion();
+    </script>
+
+</body>
+</html>
