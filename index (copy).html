@@ -7,14 +7,23 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
+            background-color: white;
+        }
+        #wrapper {
             max-width: 600px;
             margin: 0 auto;
-            background-color: white;
+            text-align: center;
         }
         #question {
             font-size: 18px;
             margin-bottom: 20px;
+            font-weight: bold;
+        }
+        #answer {
+            font-size: 14px;
+            color: #888888;
+            margin-bottom: 20px;
+            padding: 10px;
         }
         button {
             background-color: #007BFF;
@@ -31,21 +40,24 @@
     </style>
 </head>
 <body>
-    <h1>MotoresBot 🤖🛩️</h1>
-    <div id="question"></div>
-    <div id="answer" style="display: none;"></div>
-    <button id="showAnswerBtn" onclick="showAnswer()"> Mostrar respuesta 🧐 </button>
-    <button id="prevBtn" onclick="prevQuestion()">Anterior ⬅️ </button>
-    <button id="nextBtn" onclick="nextQuestion()"> Siguiente ➡️ </button>
-    <br>
-    <input type="radio" id="sequential" name="order" value="sequential" checked>
-    <label for="sequential">Por orden</label> 
-    <input type="radio" id="random" name="order" value="random">
-    <label for="random">Random</label>
+    <div id="wrapper">
+        <h1>MotoresBot 🤖🛩️</h1>
+        <div id="question"></div>
+        <div id="answer" style="display: none;"></div>
+        <button id="showAnswerBtn" onclick="showAnswer()"> Mostrar respuesta 👀 </button>
+        <button id="prevBtn" onclick="prevQuestion()">Anterior ⬅️ </button>
+        <button id="nextBtn" onclick="nextQuestion()"> Siguiente ➡️ </button>
+        <br>
+				<button id="selectBtn" onclick="chooseQuestion()">Seleccionar pregunta 🔍 </button>
+        <input type="radio" id="sequential" name="order" value="sequential" checked>
+        <label for="sequential">Por orden</label> 
+        <input type="radio" id="random" name="order" value="random">
+        <label for="random">Random</label>
+    </div>
 
     <script>
         // Replace this with your own CSV data
-        const csvData = `EXAMPLE1, EXAMPLE2`;
+        const csvData = `example1, example2`;
 
         const questions = csvData.split('\n').map(line => {
             const [question, answer] = line.split(',');
@@ -58,10 +70,16 @@
         function showQuestion(index) {
             const questionElement = document.getElementById('question');
             const answerElement = document.getElementById('answer');
-            questionElement.textContent = questions[index].question;
-            answerElement.textContent = questions[index].answer;
+            questionElement.textContent = `Pregunta: ${questions[index].question}`;
+            answerElement.textContent = `Respuesta - ${questions[index].answer}`;
             answerElement.style.display = 'none';
         }
+
+				function chooseQuestion(index) {
+				    currentIndex = index;
+				    showQuestion(currentIndex);
+				}
+				
 
         function showAnswer() {
             const answerElement = document.getElementById('answer');

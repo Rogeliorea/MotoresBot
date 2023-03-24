@@ -1,51 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title class="text-blue-500">MotoresBot 🤖🛩️ </title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: white;
-        }
-        #question {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-        button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
-        }
-        button:hover {
-            background-color: #0056B3;
-        }
-    </style>
-</head>
-<body>
-    <h1>MotoresBot 🤖🛩️</h1>
-    <div id="question"></div>
-    <div id="answer" style="display: none;"></div>
-    <button id="showAnswerBtn" onclick="showAnswer()"> Mostrar respuesta 🧐 </button>
-    <button id="prevBtn" onclick="prevQuestion()">Anterior ⬅️ </button>
-    <button id="nextBtn" onclick="nextQuestion()"> Siguiente ➡️ </button>
-    <br>
-    <input type="radio" id="sequential" name="order" value="sequential" checked>
-    <label for="sequential">Por orden</label> 
-    <input type="radio" id="random" name="order" value="random">
-    <label for="random">Random</label>
 
-    <script>
-        // Replace this with your own CSV data
-        const csvData = `Cessna 150 - Autonomía, 3.3 horas. = 3 horas 18 minutos 
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title class="text-blue-500">MotoresBot 🤖🛩️ </title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background-color: white;
+		}
+
+		#wrapper {
+			max-width: 600px;
+			margin: 0 auto;
+			text-align: center;
+		}
+
+		#question {
+			font-size: 18px;
+			margin-bottom: 20px;
+			font-weight: bold;
+		}
+
+		#answer {
+			font-size: 14px;
+			color: #888888;
+			margin-bottom: 20px;
+			padding: 10px;
+		}
+
+		.btn-primary {
+			background-color: #007BFF;
+			color: white;
+			border: none;
+			padding: 10px 20px;
+			font-size: 16px;
+			cursor: pointer;
+			margin: 5px;
+		}
+
+		.btn-primary:hover {
+			background-color: #0056B3;
+		}
+
+		.btn-secondary {
+			background-color: #E5E7EB;
+			color: black;
+			border: none;
+			padding: 10px 20px;
+			font-size: 16px;
+			cursor: pointer;
+			margin: 5px;
+		}
+
+		.btn-secondary:hover {
+			background-color: #D1D5DB;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="wrapper">
+		<h1>MotoresBot 🤖🛩️</h1>
+		<br>
+		<br>
+		<div id="question"></div>
+		<div id="answer" style="display: none;"></div>
+		<button id="prevBtn" class="btn-secondary" onclick="prevQuestion()">Anterior ⬅️ </button>
+		<button id="showAnswerBtn" class="btn-primary" onclick="showAnswer()"> Mostrar respuesta 👀 </button>
+		<button id="nextBtn" class="btn-primary" onclick="nextQuestion()"> Siguiente ➡️ </button>
+		<br>
+		<input type="radio" id="sequential" name="order" value="sequential" checked>
+		<label for="sequential">Por orden</label>
+		<input type="radio" id="random" name="order" value="random">
+		<label for="random">Random</label>
+		<br><br>
+		<label for="questionNumber"> Buscar una pregunta: </label>
+		<input type="number" id="questionNumber" name="questionNumber">
+		<button class="btn-secondary" onclick="chooseQuestion(document.getElementById('questionNumber').value)">Ir a
+			pregunta</button>
+		<br>
+		<small style="color: #888888;">Recuerda que las primeras preguntas sobre el Cessna 150 son 12, entonces súmale 12 a
+			la numeración si quieres ver el número exacto de pregunta. Ej. si quieres la 140 pon 152. </small>
+		<br>
+	</div>
+
+
+	<script>
+		// Replace this with your own CSV data
+		const csvData = `Cessna 150 - Autonomía, 3.3 horas. = 3 horas 18 minutos 
 Cessna 150 - Techo de servicio, 14 000 pies 
 Cessna 150 - Capacidad de tanques de combustible, 26 galones total  usables 22.5 galones
 Cessna 150 - Cantidad de aceite, Máximo 6 cuartos de galón (5.6 L) Mínimo 4 cuartos de galón (3.7 L)
@@ -286,47 +330,57 @@ Cessna 150 - Servicio General / Preventivo, 50 hrs
 226.- Características de una hélice hidromática,  Mismas características que una hélice de velocidad constante y se puede perfilar.
 227.- ¿Qué es el Gobernador?,  Unidad que controla las RPM´s de la hélice con presión de aceite  ósea que es hidráulico.`;
 
-        const questions = csvData.split('\n').map(line => {
-            const [question, answer] = line.split(',');
-            return { question, answer };
-        });
+		const questions = csvData.split('\n').map(line => {
+			const [question, answer] = line.split(',');
+			if (question && answer) {
+				return {question, answer};
+			}
+		}).filter(question => question); // remove undefined elements
 
-        let currentIndex = -1;
-        let prevIndex = -1;
 
-        function showQuestion(index) {
-            const questionElement = document.getElementById('question');
-            const answerElement = document.getElementById('answer');
-            questionElement.textContent = questions[index].question;
-            answerElement.textContent = questions[index].answer;
-            answerElement.style.display = 'none';
-        }
+		let currentIndex = -1;
+		let prevIndex = -1;
 
-        function showAnswer() {
-            const answerElement = document.getElementById('answer');
-            answerElement.style.display = 'block';
-        }
+		function showQuestion(index) {
+			const questionElement = document.getElementById('question');
+			const answerElement = document.getElementById('answer');
+			questionElement.textContent = `Pregunta: ${questions[index].question}`;
+			answerElement.textContent = `Respuesta: ${questions[index].answer}`;
+			answerElement.style.display = 'none';
+		}
 
-        function prevQuestion() {
-            prevIndex = currentIndex;
-            currentIndex = (currentIndex - 1 + questions.length) % questions.length;
-            showQuestion(currentIndex);
-        }
+		function showAnswer() {
+			const answerElement = document.getElementById('answer');
+			answerElement.style.display = 'block';
+		}
 
-        function nextQuestion() {
-            prevIndex = currentIndex;
-            const sequential = document.getElementById('sequential').checked;
-            if (sequential) {
-                currentIndex = (currentIndex + 1) % questions.length;
-            } else {
-                currentIndex = Math.floor(Math.random() * questions.length);
-            }
-            showQuestion(currentIndex);
-        }
+		function chooseQuestion(index) {
+			currentIndex = index;
+			showQuestion(currentIndex);
+		}
 
-        // Show the first question
-        nextQuestion();
-    </script>
+		function prevQuestion() {
+			prevIndex = currentIndex;
+			currentIndex = (currentIndex - 1 + questions.length) % questions.length;
+			showQuestion(currentIndex);
+		}
+
+		function nextQuestion() {
+			prevIndex = currentIndex;
+			const sequential = document.getElementById('sequential').checked;
+			if (sequential) {
+				currentIndex = (currentIndex + 1) % questions.length;
+			} else {
+				currentIndex = Math.floor(Math.random() * questions.length);
+			}
+			showQuestion(currentIndex);
+		}
+
+
+		// Show the first question
+		nextQuestion();
+	</script>
 
 </body>
+
 </html>
