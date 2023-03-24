@@ -57,6 +57,13 @@
 		.btn-secondary:hover {
 			background-color: #D1D5DB;
 		}
+		
+		.answer-block {
+		  height: 50px; /* Set a fixed height for the answer block */
+		  display: none; /* Hide the answer block initially */
+		}
+
+		
 	</style>
 </head>
 
@@ -66,9 +73,9 @@
 		<br>
 		<br>
 		<div id="question"></div>
-		<div id="answer" style="display: none;"></div>
+		<div id="answer" class="answer-block" style="display: none;"></div>
 		<button id="prevBtn" class="btn-secondary" onclick="prevQuestion()">Anterior ⬅️ </button>
-		<button id="showAnswerBtn" class="btn-primary" onclick="showAnswer()"> Mostrar respuesta 👀 </button>
+		<button id="showAnswerBtn" class="btn-primary" onclick="showAnswer()"> Mostrar respuesta 🫣 </button>
 		<button id="nextBtn" class="btn-primary" onclick="nextQuestion()"> Siguiente ➡️ </button>
 		<br>
 		<input type="radio" id="sequential" name="order" value="sequential" checked>
@@ -351,8 +358,15 @@ Cessna 150 - Servicio General / Preventivo, 50 hrs
 
 		function showAnswer() {
 			const answerElement = document.getElementById('answer');
-			answerElement.style.display = 'block';
+			if (answerElement.style.display === 'block') {
+				answerElement.style.display = 'none';
+				showAnswerBtn.innerHTML = 'Mostrar respuesta 🫣';
+			} else {
+				answerElement.style.display = 'block';
+				showAnswerBtn.innerHTML = 'Ocultar respuesta 🙈';
+			}
 		}
+
 
 		function chooseQuestion(index) {
 			currentIndex = index;
