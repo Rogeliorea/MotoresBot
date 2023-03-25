@@ -2,7 +2,7 @@
 <html lang="en">
 
 
-	
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,6 +34,13 @@
 			padding: 10px;
 		}
 
+		#pista {
+			font-size: 14px;
+			color: #888888;
+			margin-bottom: 10px;
+			padding: 10px;
+		}
+
 		.btn-primary {
 			background-color: #007BFF;
 			color: white;
@@ -58,17 +65,18 @@
 			cursor: pointer;
 			margin: 5px;
 		}
-
+		
 		.btn-secondary:hover {
 			background-color: #D1D5DB;
 		}
-		
-		.answer-block {
-		  height: 50px; /* Set a fixed height for the answer block */
-		  display: none; /* Hide the answer block initially */
-		}
 
 		
+		.answer-block {
+			height: 50px;
+			/* Set a fixed height for the answer block */
+			display: none;
+			/* Hide the answer block initially */
+		}
 	</style>
 </head>
 
@@ -81,9 +89,11 @@
 		<br>
 		<div id="question"></div>
 		<div id="answer" class="answer-block" style="display: none;"></div>
+		<div id="pista" class="answer-block" ></div>
 		<button id="prevBtn" class="btn-secondary" onclick="prevQuestion()">Anterior ⬅️ </button>
 		<button id="showAnswerBtn" class="btn-primary" onclick="showAnswer()"> Mostrar respuesta 🫣 </button>
 		<button id="nextBtn" class="btn-primary" onclick="nextQuestion()"> Siguiente ➡️ </button>
+		<button id="pista" class="btn-secondary" onclick="showPista()">🤔</button>
 		<br>
 		<br>
 		<input type="radio" id="sequential" name="order" value="sequential" checked>
@@ -96,41 +106,43 @@
 		<button class="btn-secondary" onclick="chooseQuestion(document.getElementById('questionNumber').value)">Ir a
 			pregunta</button>
 		<br>
-		<small style="color: #AAAAAA; font-size: 10px;">Recuerda que las primeras preguntas sobre el Cessna 150 son 12, entonces súmale 12 a
+		<small style="color: #AAAAAA; font-size: 10px;">Recuerda que las primeras preguntas sobre el Cessna 150 son 12,
+			entonces súmale 12 a
 			la numeración si quieres ver el número exacto de pregunta. Ej. si quieres la 140 pon 152. </small>
 
 		<br>
 
-			
-<br><br><br>
-<h2>Notas</h2>
-<textarea id="notes" rows="10" cols="100" style="width: 100%; border: 1px solid #ccc; font-family: arial,sans-serif;"></textarea>
 
-<br />
-    <button class="btn btn-secondary" onclick="exportNotes()">Export Notes</button>
-    <script>
-      function exportNotes() {
-        const notes = document.getElementById('notes').value;
-        const blob = new Blob([notes], {type:'text/plain'});
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = 'notes.txt';
-        link.href = url;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    </script>
-		
+		<br><br><br>
+		<h2>Notas</h2>
+		<textarea id="notes" rows="10" cols="100"
+			style="width: 100%; border: 1px solid #ccc; font-family: arial,sans-serif;"></textarea>
+
+		<br />
+		<button class="btn btn-secondary" onclick="exportNotes()">Export Notes</button>
+		<script>
+			function exportNotes() {
+				const notes = document.getElementById('notes').value;
+				const blob = new Blob([notes], {type: 'text/plain'});
+				const url = URL.createObjectURL(blob);
+				const link = document.createElement('a');
+				link.download = 'notes.txt';
+				link.href = url;
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+			}
+		</script>
+
 	</div>
 
 
 	<script>
 		// Replace this with your own CSV data
-		const csvData = `Cessna 150 - Autonomía, 3.3 horas. = 3 horas 18 minutos 
-Cessna 150 - Techo de servicio, 14 000 pies 
-Cessna 150 - Capacidad de tanques de combustible, 26 galones total  usables 22.5 galones
-Cessna 150 - Cantidad de aceite, Máximo 6 cuartos de galón (5.6 L) Mínimo 4 cuartos de galón (3.7 L)
+		const csvData = `Cessna 150 - Autonomía, 3.3 horas. = 3 horas 18 minutos
+Cessna 150 - Techo de servicio, 14 000 pies
+Cessna 150 - Capacidad de tanques de combustible, 26 galones total  usables 22.5 galones, pistapitas
+Cessna 150 - Cantidad de aceite, Máximo 6 cuartos de galón (5.6 L) Mínimo 4 cuartos de galón (3.7 L), pistapitas
 Cessna 150 - Presión de aceite, Mínima 10 psi – Normal 30-60 psi - Máxima 100 psi 
 Cessna 150 - Modelo de motores, Continental O-200-A
 Cessna 150 - Máximas RPM´s, 2 750 RPM´s 
@@ -368,12 +380,10 @@ Cessna 150 - Servicio General / Preventivo, 50 hrs
 226.- Características de una hélice hidromática,  Mismas características que una hélice de velocidad constante y se puede perfilar.
 227.- ¿Qué es el Gobernador?,  Unidad que controla las RPM´s de la hélice con presión de aceite  ósea que es hidráulico.`;
 
-		
-		const questions = csvData.split('\n').map(line => {
-			const [question, answer] = line.split(',');
-			if (question && answer) {
-				return {question, answer};
-			}
+
+		const questions = csvData.split('\n').map(line => { //split lines
+			const [question, answer, pista] = line.split(',');
+			return {question, answer, pista};
 		});
 
 		let currentIndex = -1;
@@ -382,9 +392,21 @@ Cessna 150 - Servicio General / Preventivo, 50 hrs
 		function showQuestion(index) {
 			const questionElement = document.getElementById('question');
 			const answerElement = document.getElementById('answer');
+			const pistaElement = document.getElementById('pista');
 			questionElement.textContent = `Pregunta: ${questions[index].question}`;
 			answerElement.textContent = `Respuesta: ${questions[index].answer}`;
+			pistaElement.textContent = `Pista: ${questions[index].pista}`;
 			answerElement.style.display = 'none';
+			pistaElement.style.display = 'none';
+		}
+
+		function showPista() {
+			const pistaElement = document.getElementById('pista');
+			if (pistaElement.style.display === 'block') {
+				pistaElement.style.display = 'none';
+			} else {
+				pistaElement.style.display = 'block';
+			}
 		}
 
 		function showAnswer() {
@@ -394,9 +416,10 @@ Cessna 150 - Servicio General / Preventivo, 50 hrs
 				showAnswerBtn.innerHTML = 'Mostrar respuesta 🫣';
 			} else {
 				answerElement.style.display = 'block';
-				showAnswerBtn.innerHTML = 'Ocultar respuesta 🙈';
+				showAnswerBtn.innerHTML = 'Mostrar respuesta 🫣';
 			}
 		}
+
 
 
 		function chooseQuestion(index) {
@@ -425,12 +448,11 @@ Cessna 150 - Servicio General / Preventivo, 50 hrs
 		// Show the first question
 		nextQuestion();
 
-		
+
 	</script>
 
 
-	
+
 </body>
 
 </html>
-
